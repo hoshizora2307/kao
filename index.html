@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>LOVE_OR_ERROR_FOR_KAO_LARGE</title>
+    <title>KAO_REPROACH_SYSTEM</title>
     <style>
         body { margin: 0; overflow: hidden; background: black; }
         canvas { display: block; }
@@ -11,19 +11,20 @@
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             color: #ff0000;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 8vw; /* 中央の警告メッセージもさらに大きくしました */
-            text-shadow: 0 0 20px #ff0000;
+            font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+            font-size: 10vw;
+            text-shadow: 0 0 30px #ff0000;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.1s;
+            transition: opacity 0.05s;
             text-align: center;
             font-weight: bold;
+            line-height: 1.2;
         }
     </style>
 </head>
 <body>
-    <div id="message">SYSTEM ERROR:<br>DAICHI ANNIHILATED</div>
+    <div id="message">SYSTEM ERROR:<br>KAO IS IDIOT</div>
     <canvas id="matrix"></canvas>
 
 <script>
@@ -34,38 +35,50 @@ const msg = document.getElementById('message');
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
-// 文字列から「KAO」が選ばれやすいように調整
+// 通常の文字セット
 const characters = 'KAO愛してるKAODAICHI苦しいERROR';
-const fontSize = 40; // ★ここを16から40に大きくしました
-const columns = canvas.width / fontSize;
-const drops = Array(Math.floor(columns)).fill(1);
+// レアな煽りフレーズ
+const rarePhrase = 'ＫＡＯはバカ自覚しろ';
+
+const fontSize = 60; // ★さらに巨大化しました
+const columns = Math.ceil(canvas.width / fontSize);
+const drops = Array(columns).fill(1);
 
 let irritationLevel = 0;
 
 function draw() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // 残像を少し濃くして文字を追いやすく
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)'; 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     irritationLevel += 0.005;
-    const isGlitching = Math.random() < Math.sin(irritationLevel) * 0.2;
+    const isGlitching = Math.random() < Math.sin(irritationLevel) * 0.3;
     
-    // 文字を太字（bold）にしてより強調
-    ctx.font = 'bold ' + fontSize + 'px monospace';
-    ctx.fillStyle = isGlitching ? '#f00' : '#0f0';
+    ctx.font = 'bold ' + fontSize + 'px sans-serif';
 
     for (let i = 0; i < drops.length; i++) {
-        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        let text;
+        // 2%の確率で「ＫＡＯはバカ自覚しろ」を一文字ずつではなく、その位置に差し込む
+        if (Math.random() > 0.98) {
+            ctx.fillStyle = '#ff0000'; // 煽り文句は赤くする
+            text = rarePhrase;
+        } else {
+            ctx.fillStyle = isGlitching ? '#f00' : '#0f0';
+            text = characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
             drops[i] = 0;
         }
-        drops[i] += 1 + (Math.sin(irritationLevel) * 2);
+        // 苛立ちに合わせて落下速度が変化
+        drops[i] += 1 + (Math.sin(irritationLevel) * 1.5);
     }
 
-    if (Math.sin(irritationLevel) > 0.9) {
+    // 画面反転の演出
+    if (Math.sin(irritationLevel) > 0.85) {
         msg.style.opacity = '1';
-        canvas.style.filter = 'invert(1) blur(2px)'; // 反転時に少しブレさせてバグ感を演出
+        canvas.style.filter = 'invert(1) contrast(200%)';
     } else {
         msg.style.opacity = '0';
         canvas.style.filter = 'none';
