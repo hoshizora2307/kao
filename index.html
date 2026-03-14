@@ -2,16 +2,16 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>KAO_REPROACH_SYSTEM</title>
+    <title>KAO_LOVE_AND_HATE</title>
     <style>
-        body { margin: 0; overflow: hidden; background: black; }
+        body { margin: 0; overflow: hidden; background: black; cursor: crosshair; }
         canvas { display: block; }
         #message {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             color: #ff0000;
-            font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+            font-family: sans-serif;
             font-size: 10vw;
             text-shadow: 0 0 30px #ff0000;
             pointer-events: none;
@@ -19,7 +19,23 @@
             transition: opacity 0.05s;
             text-align: center;
             font-weight: bold;
-            line-height: 1.2;
+        }
+        /* ピンクの文字のスタイリング */
+        .love-text {
+            position: absolute;
+            color: #ff69b4; /* かわいいピンク */
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            font-size: 2.5rem;
+            text-shadow: 0 0 15px #ffb6c1, 0 0 5px #fff;
+            pointer-events: none;
+            animation: fadeUp 1.5s forwards;
+            white-space: nowrap;
+            z-index: 100;
+        }
+        @keyframes fadeUp {
+            0% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -100px); }
         }
     </style>
 </head>
@@ -35,12 +51,9 @@ const msg = document.getElementById('message');
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
-// 通常の文字セット
 const characters = 'KAO愛してるKAODAICHI苦しいERROR';
-// レアな煽りフレーズ
 const rarePhrase = 'ＫＡＯはバカ自覚しろ';
-
-const fontSize = 60; // ★さらに巨大化しました
+const fontSize = 60; 
 const columns = Math.ceil(canvas.width / fontSize);
 const drops = Array(columns).fill(1);
 
@@ -57,9 +70,8 @@ function draw() {
 
     for (let i = 0; i < drops.length; i++) {
         let text;
-        // 2%の確率で「ＫＡＯはバカ自覚しろ」を一文字ずつではなく、その位置に差し込む
-        if (Math.random() > 0.98) {
-            ctx.fillStyle = '#ff0000'; // 煽り文句は赤くする
+        if (Math.random() > 0.985) {
+            ctx.fillStyle = '#ff0000'; 
             text = rarePhrase;
         } else {
             ctx.fillStyle = isGlitching ? '#f00' : '#0f0';
@@ -71,11 +83,9 @@ function draw() {
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
             drops[i] = 0;
         }
-        // 苛立ちに合わせて落下速度が変化
         drops[i] += 1 + (Math.sin(irritationLevel) * 1.5);
     }
 
-    // 画面反転の演出
     if (Math.sin(irritationLevel) > 0.85) {
         msg.style.opacity = '1';
         canvas.style.filter = 'invert(1) contrast(200%)';
@@ -85,6 +95,28 @@ function draw() {
     }
 
     requestAnimationFrame(draw);
+}
+
+// タップ（クリック）イベント
+window.addEventListener('mousedown', (e) => {
+    createLoveText(e.clientX, e.clientY);
+});
+window.addEventListener('touchstart', (e) => {
+    createLoveText(e.touches[0].clientX, e.touches[0].clientY);
+});
+
+function createLoveText(x, y) {
+    const love = document.createElement('div');
+    love.className = 'love-text';
+    love.innerText = 'I LOVE KAO.';
+    love.style.left = x + 'px';
+    love.style.top = y + 'px';
+    document.body.appendChild(love);
+
+    // アニメーションが終わったら要素を削除
+    setTimeout(() => {
+        love.remove();
+    }, 1500);
 }
 
 window.addEventListener('resize', () => {
