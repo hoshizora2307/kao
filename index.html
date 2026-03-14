@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>LOVE_OR_ERROR_FOR_KAO</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: black; }
+        canvas { display: block; }
+        #message {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 5vw;
+            text-shadow: 0 0 10px #ff0000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+    </style>
+</head>
+<body>
+    <div id="message">SYSTEM ERROR: DAICHI ANNIHILATED</div>
+    <canvas id="matrix"></canvas>
+
+<script>
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+const msg = document.getElementById('message');
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const characters = 'KAO愛してるKAODAICHI苦しい010101ERROR';
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
+
+let irritationLevel = 0;
+
+function draw() {
+    // 画面を薄く塗りつぶして残像を作る
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 苛立ちが募ると色が赤に染まっていく
+    irritationLevel += 0.005;
+    const isGlitching = Math.random() < Math.sin(irritationLevel) * 0.2;
+    
+    ctx.fillStyle = isGlitching ? '#f00' : '#0f0';
+    ctx.font = fontSize + 'px monospace';
+
+    for (let i = 0; i < drops.length; i++) {
+        const text = characters.charAt(Math.floor(Math.random() * characters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+        }
+        // 苛立ちに合わせて落下速度が加速
+        drops[i] += 1 + (Math.sin(irritationLevel) * 2);
+    }
+
+    // 対消滅の瞬間
+    if (Math.sin(irritationLevel) > 0.9) {
+        msg.style.opacity = '1';
+        canvas.style.filter = 'invert(1)';
+    } else {
+        msg.style.opacity = '0';
+        canvas.style.filter = 'none';
+    }
+
+    requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', () => {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+});
+
+draw();
+</script>
+</body>
+</html>
